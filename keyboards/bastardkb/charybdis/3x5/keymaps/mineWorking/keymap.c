@@ -22,7 +22,7 @@ uint16_t COMBO_LEN = COMBO_LENGTH;
 // 2. these consts define the keys that make up the combo - their names matter because you refer to them in 3
 // the syntax here will be lower case to differentiate them from the enums in 1
 const uint16_t PROGMEM c_del_combo[] = {LSFT_T(KC_D), KC_C, COMBO_END}; // Send Delete
-const uint16_t PROGMEM c_enter_combo[] = {LCTL_T(KC_N), KC_C, COMBO_END}; // Send Enter
+const uint16_t PROGMEM c_enter_combo[] = {LGUI_T(KC_N), KC_C, COMBO_END}; // Send Enter
 
 // 3. this list tells QMK which combos, defined by your consts, will be added to the list of combos
 // [UPPERCASE_ENUM] = COMBO_ACTION(lowercase_const),
