@@ -8,6 +8,7 @@
 #define U_CPY (LGUI(KC_C))
 #define U_PST (LGUI(KC_V))
 #define U_RDO (LGUI(KC_Y))
+#define U_LOCK (LCTL(LGUI(KC_Q)))
 
 
 enum combo_events {
@@ -73,7 +74,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT(
     KC_J,         KC_F,              KC_M,              KC_P,              KC_V,             KC_SCLN,           KC_DOT,           KC_SLSH,          KC_QUOTE,          KC_Z,
-    LGUI_T(KC_R), LALT_T(KC_S),      LCTL_T(KC_N),      LSFT_T(KC_D),      KC_W,             KC_COMM,           LSFT_T(KC_A),     LCTL_T(KC_E),     LALT_T(KC_I),      LGUI_T(KC_H),
+    LCTL_T(KC_R), LALT_T(KC_S),      LGUI_T(KC_N),      LSFT_T(KC_D),      KC_W,             KC_COMM,           LSFT_T(KC_A),     LGUI_T(KC_E),     LALT_T(KC_I),      LCTL_T(KC_H),
    LT(7, KC_X),         KC_G,              KC_L,              KC_C,              KC_B,             KC_Q,         LT(5,KC_U),             KC_O,             KC_Y,      LT(6,KC_K),
                                      LT(3, KC_BSPC),    LT(1, KC_T),       LT(2, KC_TAB),    OSM(MOD_LSFT),     LT(4, KC_SPC)    
 
@@ -82,24 +83,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //NAV//
   [1] = LAYOUT(
    KC_NO,   U_UND,   U_CPY,                         U_PST,                        U_CUT,                              U_CUT,   U_PST,   U_CPY,   U_UND,   U_RDO,
-  KC_LGUI, KC_LALT,  MS_BTN2,                       MS_BTN1,                      DRAGSCROLL_MODE,                    KC_CAPS, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT,
+  KC_LGUI, U_LOCK,  KC_BTN2,                       KC_BTN1,                      DRAGSCROLL_MODE,                    KC_CAPS, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT,
   KC_NO,    KC_NO,   POINTER_DEFAULT_DPI_REVERSE,   POINTER_DEFAULT_DPI_FORWARD,  KC_NO,                             KC_INS,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,
                      KC_NO,                         KC_NO,                        KC_ENT,                            KC_BSPC, KC_DEL  
   ),
 
 //mouse //
   [2] = LAYOUT(
-   KC_NO,               LALT(KC_LEFT),         KC_NO,        KC_ESC,       KC_NO,    U_RDO,   U_PST,   U_CPY,   U_CUT,   U_UND,
-  LCTL(LGUI(KC_LEFT)), LSG(KC_LEFT),  LSG(KC_RGHT), LCTL(LGUI(KC_RGHT)), KC_NO,            KC_NO,    MS_BTN1, MS_BTN3, MS_UP,   MS_RGHT,
-  LGUI(KC_LEFT), LGUI(KC_DOWN), LGUI(KC_UP), LGUI(KC_RIGHT), KC_NO,      KC_NO,    MS_WHLL, MS_WHLD, MS_WHLU, MS_WHLR,
-                KC_NO,         KC_NO,        KC_NO,                         MS_BTN1,  MS_BTN3
+   KC_NO,    LALT(KC_LEFT),  KC_NO,   KC_ESC,   KC_NO,     U_RDO,   U_PST,   U_CPY,   U_CUT,   U_UND,
+  KC_NO,    KC_NO,   KC_NO,   KC_NO,   KC_NO,            KC_NO,    KC_BTN1, KC_BTN3, KC_MS_U, KC_MS_R,
+   KC_NO,    KC_NO,   KC_NO,   KC_NO,   KC_NO,              KC_NO,   KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R,
+              KC_NO,  KC_NO,    KC_NO,             KC_BTN1,  KC_BTN3
   ),
 
 //Media//
   [3] = LAYOUT(
-  KC_NO,   KC_NO,    KC_NO,    KC_NO,    KC_NO,          KC_NO, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU,
-    KC_NO, LGUI(KC_4), LGUI(KC_5), LGUI(KC_6), KC_NO,      KC_NO,    KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
-    KC_NO, LALT(KC_1), LGUI(KC_2), LGUI(KC_3),             KC_NO,    KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+  KC_NO,   LALT(KC_7), LALT(KC_8), LALT(KC_9), KC_NO,      KC_NO, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU,
+    KC_NO, LALT(KC_4), LALT(KC_5), LALT(KC_6), KC_NO,      KC_NO,    KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT,
+    KC_NO, LALT(KC_1), LALT(KC_2), LALT(KC_3),             KC_NO,    KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
                       KC_NO,   KC_NO,  KC_NO,              KC_MSTP, KC_MPLY 
   ),
 //RIGHT HAND
@@ -108,14 +109,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_LBRC, KC_7,    KC_8,    KC_9,    KC_RBRC, KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,
     KC_SCLN, KC_4,    KC_5,    KC_6,    KC_EQL,  KC_NO,    KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI,
     KC_GRV,  KC_1,    KC_2,    KC_3,    KC_BSLS, KC_NO,    KC_NO,    KC_NO,    KC_ALGR, KC_NO,
-                      KC_DOT,  KC_0,    KC_MINS, KC_NO,    KC_NO    
+                               KC_DOT,  KC_0,    KC_MINS,  KC_NO,    KC_NO    
   ),
 //Right Button//
   [5] = LAYOUT(
     KC_LCBR, KC_AMPR, KC_ASTR, KC_LPRN, KC_RCBR, KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,
     KC_COLN, KC_DLR,  KC_PERC, KC_CIRC, KC_PLUS, KC_NO,    KC_LSFT, KC_LCTL, KC_LALT, KC_LGUI,
     KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_PIPE, KC_NO,    KC_NO,    KC_NO,    KC_ALGR, KC_NO,
-                       KC_LPRN, KC_RPRN, KC_UNDS, KC_ENT,    KC_NO   
+                       KC_LPRN, KC_RPRN, KC_UNDS, KC_ENT,    KC_TILDE   
   ),
   
   //Function//
