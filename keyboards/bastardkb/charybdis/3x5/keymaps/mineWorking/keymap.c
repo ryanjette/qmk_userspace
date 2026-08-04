@@ -14,6 +14,7 @@
 enum combo_events {
     C_DEL,
     C_ENTER,
+    C_BSPC,
     COMBO_LENGTH
 };
 // the point of the list is to define this variable which QMK uses to define how many combos will exist
@@ -23,12 +24,14 @@ uint16_t COMBO_LEN = COMBO_LENGTH;
 // the syntax here will be lower case to differentiate them from the enums in 1
 const uint16_t PROGMEM c_del_combo[] = {LSFT_T(KC_D), KC_C, COMBO_END}; // Send Delete
 const uint16_t PROGMEM c_enter_combo[] = {LGUI_T(KC_N), KC_C, COMBO_END}; // Send Enter
+const uint16_t PROGMEM c_bspc_combo[] = {KC_M, KC_P, COMBO_END}; // Send Backspace
 
 // 3. this list tells QMK which combos, defined by your consts, will be added to the list of combos
 // [UPPERCASE_ENUM] = COMBO_ACTION(lowercase_const),
 combo_t key_combos[] = {
     [C_DEL] = COMBO_ACTION(c_del_combo),
-    [C_ENTER] = COMBO_ACTION(c_enter_combo)
+    [C_ENTER] = COMBO_ACTION(c_enter_combo),
+    [C_BSPC] = COMBO_ACTION(c_bspc_combo)
 
 };
 
@@ -43,6 +46,11 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
     case C_ENTER:
       if (pressed){
        tap_code16(KC_ENT);
+      }
+      break;
+    case C_BSPC:
+      if (pressed){
+       tap_code16(KC_BSPC);
       }
       break;
   }
@@ -76,7 +84,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_J,         KC_F,              KC_M,              KC_P,              KC_V,             KC_SCLN,           KC_DOT,           KC_SLSH,          KC_QUOTE,          KC_Z,
     LCTL_T(KC_R), LALT_T(KC_S),      LGUI_T(KC_N),      LSFT_T(KC_D),      KC_W,             KC_COMM,           LSFT_T(KC_A),     LGUI_T(KC_E),     LALT_T(KC_I),      LCTL_T(KC_H),
    LT(7, KC_X),         KC_G,              KC_L,              KC_C,              KC_B,             KC_Q,         LT(5,KC_U),             KC_O,             KC_Y,      LT(6,KC_K),
-                                     LT(3, KC_BSPC),    LT(1, KC_T),       LT(2, KC_TAB),    OSM(MOD_LSFT),     LT(4, KC_SPC)    
+                                     LT(3, KC_NO),    LT(1, KC_T),       LT(2, KC_TAB),    OSM(MOD_LSFT),     LT(4, KC_SPC)    
 
   ),
 
@@ -90,10 +98,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 //mouse //
   [2] = LAYOUT(
-   KC_NO,    LALT(KC_LEFT),  KC_NO,   KC_ESC,   KC_NO,     U_RDO,   U_PST,   U_CPY,   U_CUT,   U_UND,
-  KC_NO,    KC_NO,   KC_NO,   KC_NO,   KC_NO,            KC_NO,    KC_BTN1, KC_BTN3, KC_MS_U, KC_MS_R,
-   KC_NO,    KC_NO,   KC_NO,   KC_NO,   KC_NO,              KC_NO,   KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R,
-              KC_NO,  KC_NO,    KC_NO,             KC_BTN1,  KC_BTN3
+   KC_NO,    LALT(KC_LEFT),  KC_NO,   KC_ESC,   KC_NO,                   U_RDO,   U_PST,   U_CPY,   U_CUT,   U_UND,
+  KC_NO,    LALT(KC_LEFT),   LALT(KC_RGHT),   KC_NO,   KC_NO,            KC_NO,    KC_BTN1, KC_BTN3, KC_MS_U, KC_MS_R,
+   KC_NO,    KC_NO,   KC_NO,   KC_NO,   KC_NO,                           KC_NO,   KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R,
+              KC_NO,  KC_NO,    KC_NO,                                   KC_NO,  KC_NO
   ),
 
 //Media//
