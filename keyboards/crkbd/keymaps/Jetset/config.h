@@ -48,3 +48,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define COMBO_VARIABLE_LEN
+#define COMBO_SHOULD_TRIGGER

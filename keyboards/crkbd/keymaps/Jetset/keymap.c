@@ -1,5 +1,6 @@
 
 #include QMK_KEYBOARD_H
+#include "oneshot.h"
 // 1. this comma separated list defines how many combos will exist in the firmware
 // keep this list 1:1 with the consts below
 // the enums here will be written in CAPS to differentiate them from the consts in 2
@@ -9,10 +10,27 @@
 #define U_PST (LCTL(KC_V))
 #define U_RDO (LCTL(KC_Y))
 
+enum layers {
+  NAV = 1,
+  NUM = 4
+};
+
+enum custom_keycodes {
+    OS_SHFT = SAFE_RANGE,
+    OS_CTRL,
+    OS_ALT,
+    OS_CMD
+};
 
 enum combo_events {
     C_DEL,
     C_ENTER,
+    C_V,
+    C_SCLN,
+    C_W,
+    C_COMM,
+    C_B,
+    C_Q,
     COMBO_LENGTH
 };
 // the point of the list is to define this variable which QMK uses to define how many combos will exist
@@ -20,67 +38,92 @@ uint16_t COMBO_LEN = COMBO_LENGTH;
 
 // 2. these consts define the keys that make up the combo - their names matter because you refer to them in 3
 // the syntax here will be lower case to differentiate them from the enums in 1
-const uint16_t PROGMEM c_del_combo[] = {LSFT_T(KC_D), KC_C, COMBO_END}; // Send Delete
-const uint16_t PROGMEM c_enter_combo[] = {LCTL_T(KC_N), KC_C, COMBO_END}; // Send Enter
+const uint16_t PROGMEM c_del_combo[] = {KC_D, KC_C, COMBO_END}; // Send Delete
+const uint16_t PROGMEM c_enter_combo[] = {KC_N, KC_C, COMBO_END}; // Send Enter
+const uint16_t PROGMEM c_v_combo[] = {KC_M, KC_P, COMBO_END};
+const uint16_t PROGMEM c_scln_combo[] = {KC_DOT, KC_SLSH, COMBO_END};
+const uint16_t PROGMEM c_w_combo[] = {KC_N, KC_D, COMBO_END};
+const uint16_t PROGMEM c_comm_combo[] = {KC_A, KC_E, COMBO_END};
+const uint16_t PROGMEM c_b_combo[] = {KC_L, KC_C, COMBO_END};
+const uint16_t PROGMEM c_q_combo[] = {LT(5, KC_U), KC_O, COMBO_END};
 
-// 3. this list tells QMK which combos, defined by your consts, will be added to the list of combos
-// [UPPERCASE_ENUM] = COMBO_ACTION(lowercase_const),
+// 3. This list maps each combo to the keycode it sends.
 combo_t key_combos[] = {
-    [C_DEL] = COMBO_ACTION(c_del_combo),
-    [C_ENTER] = COMBO_ACTION(c_enter_combo)
+    [C_DEL] = COMBO(c_del_combo, KC_DEL),
+    [C_ENTER] = COMBO(c_enter_combo, KC_ENT),
+    [C_V] = COMBO(c_v_combo, KC_V),
+    [C_SCLN] = COMBO(c_scln_combo, KC_SCLN),
+    [C_W] = COMBO(c_w_combo, KC_W),
+    [C_COMM] = COMBO(c_comm_combo, KC_COMM),
+    [C_B] = COMBO(c_b_combo, KC_B),
+    [C_Q] = COMBO(c_q_combo, KC_Q)
 
 };
 
-// 4. this switch/case block tells QMK what each combo does when it is pressed
-void process_combo_event(uint16_t combo_index, bool pressed) {
-  switch(combo_index) {
-    case C_DEL:
-      if (pressed){
-       tap_code16(KC_DEL);
-      }
-      break;
-    case C_ENTER:
-      if (pressed){
-       tap_code16(KC_ENT);
-      }
-      break;
+bool combo_should_trigger(uint16_t combo_index, combo_t *combo, uint16_t keycode, keyrecord_t *record) {
+  (void)combo;
+  (void)keycode;
+  (void)record;
+
+  return get_highest_layer(layer_state) == 0;
+}
+
+static oneshot_state os_shft_state = os_up_unqueued;
+static oneshot_state os_ctrl_state = os_up_unqueued;
+static oneshot_state os_alt_state = os_up_unqueued;
+static oneshot_state os_cmd_state = os_up_unqueued;
+
+bool is_oneshot_cancel_key(uint16_t keycode) {
+  return keycode == MO(NAV) || keycode == MO(NUM) || keycode == TO(8);
+}
+
+bool is_oneshot_ignored_key(uint16_t keycode) {
+  switch (keycode) {
+    case MO(NAV):
+    case MO(NUM):
+    case TO(8):
+    case KC_LSFT:
+    case KC_LCTL:
+    case KC_LALT:
+    case KC_LGUI:
+    case OS_SHFT:
+    case OS_CTRL:
+    case OS_ALT:
+    case OS_CMD:
+      return true;
+    default:
+      return false;
   }
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  update_oneshot(&os_shft_state, KC_LSFT, OS_SHFT, keycode, record);
+  update_oneshot(&os_ctrl_state, KC_LCTL, OS_CTRL, keycode, record);
+  update_oneshot(&os_alt_state, KC_LALT, OS_ALT, keycode, record);
+  update_oneshot(&os_cmd_state, KC_LGUI, OS_CMD, keycode, record);
+  return true;
 }
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_split_3x6_3(
-    KC_NO,     KC_J,           KC_F,           KC_M,             KC_P,           KC_V,               KC_SCLN,         KC_DOT,          KC_SLSH,        KC_QUOTE,       KC_Z,           KC_NO,
-    KC_NO,     LGUI_T(KC_R),   LALT_T(KC_S),   LCTL_T(KC_N),     LSFT_T(KC_D),   KC_W,               KC_COMM,         LSFT_T(KC_A),    LCTL_T(KC_E),   LALT_T(KC_I),   LGUI_T(KC_H),   KC_NO,
-    KC_NO,     LT(7, KC_X),    KC_G,           KC_L,             KC_C,           KC_B,               KC_Q,            LT(5, KC_U),     KC_O,           KC_Y,           LT(6, KC_K),    KC_NO,
-                                               LT(3, KC_BSPC),   LT(1, KC_T),    LT(2, KC_TAB),      OSM(MOD_LSFT),   LT(4, KC_SPC),   TG(8)
+    KC_NO,     KC_J,           KC_F,           KC_M,             KC_P,           KC_NO,              KC_NO,           KC_DOT,          KC_SLSH,        KC_QUOTE,       KC_Z,           KC_NO,
+    KC_NO,     KC_R,           KC_S,           KC_N,             KC_D,           KC_NO,              KC_NO,           KC_A,            KC_E,           KC_I,           KC_H,           KC_NO,
+    KC_NO,     LT(7, KC_X),    KC_G,           KC_L,             KC_C,           KC_NO,              KC_NO,           LT(5, KC_U),     KC_O,           KC_Y,           LT(6, KC_K),    KC_NO,
+                                               KC_NO,            KC_T,           MO(NAV),            MO(NUM),         KC_SPC,          TO(8)
 
   ),
 
-  [1] = LAYOUT_split_3x6_3(
+  [NAV] = LAYOUT_split_3x6_3(
     KC_NO,     KC_NO,          U_UND,          U_CPY,            U_PST,          U_CUT,              U_CUT,           U_PST,           U_CPY,          U_UND,          U_RDO,          KC_NO,
-    KC_NO,     KC_LGUI,        KC_LALT,        KC_LCTL,          KC_LSFT,        KC_NO,              KC_CAPS,         KC_LEFT,         KC_DOWN,        KC_UP,          KC_RGHT,        KC_NO,
+    KC_NO,     OS_CMD,        OS_ALT,        OS_CTRL,          OS_SHFT,        KC_NO,              KC_CAPS,         KC_LEFT,         KC_DOWN,        KC_UP,          KC_RGHT,        KC_NO,
     KC_NO,     KC_NO,          KC_NO,          KC_NO,            KC_NO,          KC_NO,              KC_INS,          KC_HOME,         KC_PGDN,        KC_PGUP,        KC_END,         KC_NO,
-                                               KC_NO,            KC_NO,          KC_ENT,             KC_BSPC,         KC_DEL,          KC_NO
-  ),
-
-  [2] = LAYOUT_split_3x6_3(
-    KC_NO,     KC_NO,          KC_NO,          KC_NO,            KC_NO,          KC_NO,              U_RDO,           U_PST,           U_CPY,          U_CUT,          U_UND,          KC_NO,
-    KC_NO,     KC_LGUI,        KC_LALT,        KC_LCTL,          KC_LSFT,        KC_NO,              KC_NO,           KC_MS_L,         KC_MS_D,        KC_MS_U,        KC_MS_R,        KC_NO,
-    KC_NO,     KC_NO,          KC_ALGR,        KC_NO,            KC_NO,          KC_NO,              KC_NO,           KC_WH_L,         KC_WH_D,        KC_WH_U,        KC_WH_R,        KC_NO,
-                                               KC_NO,            KC_NO,          KC_NO,              KC_BTN1,         KC_BTN3,         KC_BTN2
-  ),
-
-  [3] = LAYOUT_split_3x6_3(
-    KC_NO,     KC_NO,          KC_NO,          KC_NO,            KC_NO,          KC_NO,              RGB_TOG,         RGB_MOD,         RGB_HUI,        RGB_SAI,        RGB_VAI,        KC_NO,
-    KC_NO,     KC_LGUI,        KC_LALT,        KC_LCTL,          KC_LSFT,        KC_NO,              KC_NO,           KC_MPRV,         KC_VOLD,        KC_VOLU,        KC_MNXT,        KC_NO,
-    KC_NO,     KC_NO,          KC_ALGR,        KC_NO,            KC_NO,          KC_NO,              KC_NO,           KC_NO,           KC_NO,          KC_NO,          KC_NO,          KC_NO,
-                                               KC_NO,            KC_NO,          KC_NO,              KC_MSTP,         KC_MPLY,         KC_MUTE
+                                               KC_NO,            KC_NO,          KC_NO,              KC_BSPC,         KC_DEL,          KC_NO
   ),
 
   // Right hand
-  [4] = LAYOUT_split_3x6_3(
+  [NUM] = LAYOUT_split_3x6_3(
     KC_NO,     KC_LBRC,        KC_7,           KC_8,             KC_9,           KC_RBRC,            KC_NO,           KC_NO,           KC_NO,          KC_NO,          KC_NO,          KC_NO,
-    KC_NO,     KC_SCLN,        KC_4,           KC_5,             KC_6,           KC_EQL,             KC_NO,           KC_LSFT,         KC_LCTL,        KC_LALT,        KC_LGUI,        KC_NO,
+    KC_NO,     KC_SCLN,        KC_4,           KC_5,             KC_6,           KC_EQL,             KC_NO,           OS_SHFT,         OS_CTRL,        OS_ALT,        OS_CMD,        KC_NO,
     KC_NO,     KC_GRV,         KC_1,           KC_2,             KC_3,           KC_BSLS,            KC_NO,           KC_NO,           KC_NO,          KC_ALGR,        KC_NO,          KC_NO,
                                                KC_DOT,           KC_0,           KC_MINS,            KC_NO,           KC_NO,           KC_NO
   ),
