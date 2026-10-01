@@ -46,6 +46,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Recommended for heavy chording.
 #define QMK_KEYS_PER_SCAN 4
 
-
+#define COMBO_TERM 50 
 #define COMBO_VARIABLE_LEN
 #define COMBO_SHOULD_TRIGGER

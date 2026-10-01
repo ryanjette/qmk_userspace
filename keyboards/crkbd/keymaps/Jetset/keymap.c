@@ -25,12 +25,13 @@ enum custom_keycodes {
 enum combo_events {
     C_DEL,
     C_ENTER,
+    C_ESC,
     C_V,
-    C_SCLN,
     C_W,
-    C_COMM,
     C_B,
-    C_Q,
+    C_SCLN,
+    C_COMM,
+    C_Z,
     COMBO_LENGTH
 };
 // the point of the list is to define this variable which QMK uses to define how many combos will exist
@@ -40,23 +41,25 @@ uint16_t COMBO_LEN = COMBO_LENGTH;
 // the syntax here will be lower case to differentiate them from the enums in 1
 const uint16_t PROGMEM c_del_combo[] = {KC_D, KC_C, COMBO_END}; // Send Delete
 const uint16_t PROGMEM c_enter_combo[] = {KC_N, KC_C, COMBO_END}; // Send Enter
-const uint16_t PROGMEM c_v_combo[] = {KC_M, KC_P, COMBO_END};
-const uint16_t PROGMEM c_scln_combo[] = {KC_DOT, KC_SLSH, COMBO_END};
-const uint16_t PROGMEM c_w_combo[] = {KC_N, KC_D, COMBO_END};
-const uint16_t PROGMEM c_comm_combo[] = {KC_A, KC_E, COMBO_END};
-const uint16_t PROGMEM c_b_combo[] = {KC_L, KC_C, COMBO_END};
-const uint16_t PROGMEM c_q_combo[] = {LT(5, KC_U), KC_O, COMBO_END};
+const uint16_t PROGMEM c_esc_combo[] = {KC_M, KC_D, COMBO_END};
+const uint16_t PROGMEM c_v_combo[] = {KC_F, KC_P, COMBO_END};
+const uint16_t PROGMEM c_w_combo[] = {KC_D, KC_S, COMBO_END};
+const uint16_t PROGMEM c_b_combo[] = {KC_G, KC_C, COMBO_END};
+const uint16_t PROGMEM c_scln_combo[] = {KC_DOT, KC_QUOTE, COMBO_END};
+const uint16_t PROGMEM c_comm_combo[] = {KC_A, KC_I, COMBO_END};
+const uint16_t PROGMEM c_z_combo[] = {KC_U, KC_Y, COMBO_END};
 
 // 3. This list maps each combo to the keycode it sends.
 combo_t key_combos[] = {
     [C_DEL] = COMBO(c_del_combo, KC_DEL),
     [C_ENTER] = COMBO(c_enter_combo, KC_ENT),
+    [C_ESC] = COMBO(c_esc_combo, KC_ESC),
     [C_V] = COMBO(c_v_combo, KC_V),
-    [C_SCLN] = COMBO(c_scln_combo, KC_SCLN),
     [C_W] = COMBO(c_w_combo, KC_W),
-    [C_COMM] = COMBO(c_comm_combo, KC_COMM),
     [C_B] = COMBO(c_b_combo, KC_B),
-    [C_Q] = COMBO(c_q_combo, KC_Q)
+    [C_SCLN] = COMBO(c_scln_combo, KC_SCLN),
+    [C_COMM] = COMBO(c_comm_combo, KC_COMM),
+    [C_Z] = COMBO(c_z_combo, KC_Z)
 
 };
 
@@ -106,17 +109,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_split_3x6_3(
-    KC_NO,     KC_J,           KC_F,           KC_M,             KC_P,           KC_NO,              KC_NO,           KC_DOT,          KC_SLSH,        KC_QUOTE,       KC_Z,           KC_NO,
+    KC_NO,     KC_J,           KC_F,           KC_M,             KC_P,           KC_NO,              KC_NO,           KC_DOT,          KC_SLSH,        KC_QUOTE,       KC_Q,           KC_NO,
     KC_NO,     KC_R,           KC_S,           KC_N,             KC_D,           KC_NO,              KC_NO,           KC_A,            KC_E,           KC_I,           KC_H,           KC_NO,
-    KC_NO,     LT(7, KC_X),    KC_G,           KC_L,             KC_C,           KC_NO,              KC_NO,           LT(5, KC_U),     KC_O,           KC_Y,           LT(6, KC_K),    KC_NO,
-                                               KC_NO,            KC_T,           MO(NAV),            MO(NUM),         KC_SPC,          TO(8)
+    KC_NO,     KC_X,           KC_G,           KC_L,             KC_C,           KC_NO,              KC_NO,           KC_U,           KC_O,           KC_Y,           LT(6, KC_K),    KC_NO,
+                                               KC_NO,            MT(MOD_RSFT, KC_T),           MO(NAV),            MO(NUM),         MT(MOD_LSFT, KC_SPC),          TO(8)
 
   ),
 
   [NAV] = LAYOUT_split_3x6_3(
-    KC_NO,     KC_NO,          U_UND,          U_CPY,            U_PST,          U_CUT,              U_CUT,           U_PST,           U_CPY,          U_UND,          U_RDO,          KC_NO,
+    KC_NO,     U_CUT,          U_UND,          U_CPY,            U_PST,          KC_NO,              U_CUT,           U_PST,           U_CPY,          U_UND,          U_RDO,          KC_NO,
     KC_NO,     OS_CMD,        OS_ALT,        OS_CTRL,          OS_SHFT,        KC_NO,              KC_CAPS,         KC_LEFT,         KC_DOWN,        KC_UP,          KC_RGHT,        KC_NO,
-    KC_NO,     KC_NO,          KC_NO,          KC_NO,            KC_NO,          KC_NO,              KC_INS,          KC_HOME,         KC_PGDN,        KC_PGUP,        KC_END,         KC_NO,
+    KC_NO,     KC_NO,          KC_NO,          KC_TAB,            KC_BSPC,        KC_NO,              KC_INS,          KC_HOME,         KC_PGDN,        KC_PGUP,        KC_END,         KC_NO,
                                                KC_NO,            KC_NO,          KC_NO,              KC_BSPC,         KC_DEL,          KC_NO
   ),
 

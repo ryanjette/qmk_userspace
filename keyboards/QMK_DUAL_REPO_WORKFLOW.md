@@ -58,6 +58,27 @@ qmk-bkb compile -kb bastardkb/charybdis/3x5 -km mineWorking
 qmk-up compile -kb <keyboard> -km <keymap>
 ```
 
+### Build and flash Elite-C firmware
+
+Elite-C controllers use the Atmel DFU bootloader. Set this in the keymap's
+`rules.mk`:
+
+```make
+BOOTLOADER = atmel-dfu
+```
+
+For the Jetset Corne keymap, run the flash command and then press the
+controller's reset button when QMK begins waiting for the DFU device:
+
+```sh
+qmk-up flash -kb crkbd -km Jetset
+```
+
+Flash each half separately. The reset button normally restarts the firmware;
+while the flash command is waiting, it makes the Elite-C enumerate as the
+Atmel DFU device. The command erases, flashes, validates, and resets the
+controller automatically.
+
 ### Sanity check which repo a command will use
 
 ```sh
@@ -134,3 +155,20 @@ Use the prefixed commands only (`qmk-bkb` or `qmk-up`) and verify with:
 qmk-bkb-env
 qmk-up-env
 ```
+
+### Elite-C is not detected for flashing
+
+Start the upstream flash command first, then press reset on the connected
+half. The expected bootloader device is `03EB:2FF4` (`ATm32U4DFU`). If using
+the native macOS command-line flasher instead of QMK, use the ARM64 Homebrew
+binary:
+
+```sh
+/opt/homebrew/bin/dfu-programmer atmega32u4 erase --force
+/opt/homebrew/bin/dfu-programmer atmega32u4 flash --force \
+	/Users/ryan.jette/Documents/GitHub/qmk_userspace/crkbd_rev1_Jetset.hex
+```
+
+QMK Toolbox's bundled `dfu-programmer` may be Intel-only on Apple Silicon and
+can fail with `Bad CPU type in executable`; the Homebrew binary avoids that
+problem.
