@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jetski keymap | Corne</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #171915;
+      --muted: #74766d;
+      --paper: #fffefa;
+      --key: #f3efdf;
+      --key-edge: #e8e2d0;
+      --accent: #315e59;
+      --line: #d9d8cf;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#d7d5cb 0.55px, transparent 0.55px);
+      background-size: 15px 15px;
+      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+    }
+    main { width: min(100% - 36px, 1040px); margin: 0 auto; padding: 38px 0 54px; }
+    .masthead { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    h1, h2, p { margin: 0; }
+    h1 { font-size: 15px; font-weight: 750; text-transform: uppercase; }
+    .meta, .layer-index, .legend, .key-label, .key-detail { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    .meta { color: var(--muted); font-size: 11px; }
+    nav { display: flex; flex-wrap: wrap; gap: 7px; padding: 20px 0 26px; }
+    nav button {
+      min-height: 34px; padding: 0 11px; border: 1px solid var(--line); border-radius: 3px;
+      color: var(--ink); background: rgba(255, 254, 250, 0.84);
+      font: 600 11px "SFMono-Regular", Consolas, monospace; cursor: pointer;
+    }
+    nav button:hover { border-color: var(--accent); }
+    nav button[aria-pressed="true"] { border-color: var(--accent); color: white; background: var(--accent); }
+    .layer-heading { display: flex; align-items: baseline; gap: 12px; margin: 0 0 21px; }
+    .layer-index { color: var(--accent); font-size: 12px; font-weight: 700; }
+    h2 { font-size: clamp(18px, 3vw, 24px); font-weight: 740; text-transform: uppercase; }
+    .board { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 6vw, 72px); align-items: start; }
+    .half { min-width: 0; }
+    .key-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 7px; }
+    .key {
+      position: relative; display: flex; min-width: 0; aspect-ratio: 1.16 / 1; align-items: center; justify-content: center;
+      flex-direction: column; border: 1px solid var(--key-edge); border-bottom-width: 3px; border-radius: 3px;
+      background: var(--key); text-align: center;
+    }
+    .key.empty { border-color: transparent; background: transparent; }
+    .key.layer-trigger { outline: 1px dashed #84918b; outline-offset: -4px; }
+    .key-label { overflow-wrap: anywhere; font-size: clamp(10px, 1.45vw, 14px); line-height: 1.15; font-weight: 650; }
+    .key-detail { margin-top: 4px; color: var(--muted); font-size: clamp(8px, 1.05vw, 10px); line-height: 1.1; }
+    .thumbs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; width: 50%; margin-top: 10px; }
+    .left .thumbs { margin-left: 50%; }
+    .right .thumbs { margin-right: 50%; }
+    .thumbs .key { aspect-ratio: 1.13 / 0.76; }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 34px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .legend-mark { width: 16px; height: 12px; border: 1px dashed #84918b; background: var(--key); }
+    @media (max-width: 760px) {
+      main { width: min(100% - 22px, 440px); padding-top: 24px; }
+      .masthead { align-items: flex-start; flex-direction: column; gap: 5px; }
+      nav { gap: 6px; padding: 16px 0 22px; }
+      nav button { padding: 0 8px; font-size: 10px; }
+      .board { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .key-grid, .thumbs { gap: 4px; }
+      .key { aspect-ratio: 0.88 / 1; }
+      .thumbs .key { aspect-ratio: 0.92 / 0.76; }
+      .key-label { font-size: clamp(8px, 2.5vw, 11px); }
+      .key-detail { font-size: 7px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <h1>Corne · Jetski</h1>
+      <p class="meta">LAYOUT_split_3x6_3 / 10 layers</p>
+    </header>
+    <nav aria-label="Select keymap layer" id="layer-nav"></nav>
+    <section aria-live="polite" aria-atomic="true">
+      <div class="layer-heading"><span class="layer-index" id="layer-index"></span><h2 id="layer-title"></h2></div>
+      <div class="board" id="board"></div>
+    </section>
+    <footer class="legend">
+      <span><i class="legend-mark" aria-hidden="true"></i> layer-tap / layer-toggle key</span>
+      <span>small text = hold action</span>
+      <span>blank = KC_NO</span>
+    </footer>
+  </main>
+  <script>
+    const layers = [
+      { name: "Base", rows: [
+        ["KC_NO", "KC_J", "KC_F", "KC_M", "KC_P", "KC_V", "KC_SCLN", "KC_DOT", "KC_SLSH", "KC_QUOTE", "KC_Z", "KC_NO"],
+        ["KC_NO", "LGUI_T(KC_R)", "LALT_T(KC_S)", "LCTL_T(KC_N)", "LSFT_T(KC_D)", "KC_W", "KC_COMM", "LSFT_T(KC_A)", "LCTL_T(KC_E)", "LALT_T(KC_I)", "LGUI_T(KC_H)", "KC_NO"],
+        ["KC_NO", "LT(7,KC_X)", "KC_G", "KC_L", "KC_C", "KC_B", "KC_Q", "LT(5,KC_U)", "KC_O", "KC_Y", "LT(6,KC_K)", "KC_NO"]
+      ], thumbs: ["LT(3,KC_BSPC)", "LT(1,KC_T)", "LT(2,KC_TAB)", "OSM(MOD_LSFT)", "LT(4,KC_SPC)", "TG(8)"] },
+      { name: "Navigation", rows: [
+        ["KC_NO", "KC_NO", "U_UND", "U_CPY", "U_PST", "U_CUT", "U_CUT", "U_PST", "U_CPY", "U_UND", "U_RDO", "KC_NO"],
+        ["KC_NO", "KC_LGUI", "KC_LALT", "KC_LCTL", "KC_LSFT", "KC_NO", "KC_CAPS", "KC_LEFT", "KC_DOWN", "KC_UP", "KC_RGHT", "KC_NO"],
+        ["KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_INS", "KC_HOME", "KC_PGDN", "KC_PGUP", "KC_END", "KC_NO"]
+      ], thumbs: ["KC_NO", "KC_NO", "KC_ENT", "KC_BSPC", "KC_DEL", "KC_NO"] },
+      { name: "Mouse", rows: [
+        ["KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "U_RDO", "U_PST", "U_CPY", "U_CUT", "U_UND", "KC_NO"],
+        ["KC_NO", "KC_LGUI", "KC_LALT", "KC_LCTL", "KC_LSFT", "KC_NO", "KC_NO", "KC_MS_L", "KC_MS_D", "KC_MS_U", "KC_MS_R", "KC_NO"],
+        ["KC_NO", "KC_NO", "KC_ALGR", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_WH_L", "KC_WH_D", "KC_WH_U", "KC_WH_R", "KC_NO"]
+      ], thumbs: ["KC_NO", "KC_NO", "KC_NO", "KC_BTN1", "KC_BTN3", "KC_BTN2"] },
+      { name: "Media + RGB", rows: [
+        ["KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "RGB_TOG", "RGB_MOD", "RGB_HUI", "RGB_SAI", "RGB_VAI", "KC_NO"],
+        ["KC_NO", "KC_LGUI", "KC_LALT", "KC_LCTL", "KC_LSFT", "KC_NO", "KC_NO", "KC_MPRV", "KC_VOLD", "KC_VOLU", "KC_MNXT", "KC_NO"],
+        ["KC_NO", "KC_NO", "KC_ALGR", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO"]
+      ], thumbs: ["KC_NO", "KC_NO", "KC_NO", "KC_MSTP", "KC_MPLY", "KC_MUTE"] },
+      { name: "Numbers", rows: [
+        ["KC_NO", "KC_LBRC", "KC_7", "KC_8", "KC_9", "KC_RBRC", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO"],
+        ["KC_NO", "KC_SCLN", "KC_4", "KC_5", "KC_6", "KC_EQL", "KC_NO", "KC_LSFT", "KC_LCTL", "KC_LALT", "KC_LGUI", "KC_NO"],
+        ["KC_NO", "KC_GRV", "KC_1", "KC_2", "KC_3", "KC_BSLS", "KC_NO", "KC_NO", "KC_NO", "KC_ALGR", "KC_NO", "KC_NO"]
+      ], thumbs: ["KC_DOT", "KC_0", "KC_MINS", "KC_NO", "KC_NO", "KC_NO"] },
+      { name: "Symbols", rows: [
+        ["KC_NO", "KC_LCBR", "KC_AMPR", "KC_ASTR", "KC_LPRN", "KC_RCBR", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO"],
+        ["KC_NO", "KC_COLN", "KC_DLR", "KC_PERC", "KC_CIRC", "KC_PLUS", "KC_NO", "KC_LSFT", "KC_LCTL", "KC_LALT", "KC_LGUI", "KC_NO"],
+        ["KC_NO", "KC_TILD", "KC_EXLM", "KC_AT", "KC_HASH", "KC_PIPE", "KC_NO", "KC_NO", "KC_NO", "KC_ALGR", "KC_NO", "KC_NO"]
+      ], thumbs: ["KC_LPRN", "KC_RPRN", "KC_UNDS", "KC_ENT", "KC_NO", "KC_NO"] },
+      { name: "Function", rows: [
+        ["KC_NO", "KC_F12", "KC_F7", "KC_F8", "KC_F9", "KC_PSCR", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO"],
+        ["KC_NO", "KC_F11", "KC_F4", "KC_F5", "KC_F6", "KC_NO", "KC_NO", "KC_LSFT", "KC_LCTL", "KC_LALT", "KC_LGUI", "KC_NO"],
+        ["KC_NO", "KC_F10", "KC_F1", "KC_F2", "KC_F3", "KC_PAUS", "KC_NO", "KC_NO", "KC_NO", "KC_ALGR", "KC_NO", "KC_NO"]
+      ], thumbs: ["KC_APP", "KC_SPC", "KC_TAB", "KC_NO", "KC_NO", "KC_NO"] },
+      { name: "Navigation · Escape", rows: [
+        ["KC_NO", "KC_NO", "U_UND", "U_CPY", "U_PST", "U_CUT", "U_CUT", "U_PST", "U_CPY", "U_UND", "U_RDO", "KC_NO"],
+        ["KC_NO", "KC_LGUI", "KC_LALT", "KC_LCTL", "KC_LSFT", "KC_NO", "KC_CAPS", "KC_LEFT", "KC_DOWN", "KC_UP", "KC_RGHT", "KC_NO"],
+        ["KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_ESC", "KC_NO", "KC_INS", "KC_HOME", "KC_PGDN", "KC_PGUP", "KC_END", "KC_NO"]
+      ], thumbs: ["KC_NO", "KC_ESC", "KC_ENT", "KC_BSPC", "KC_DEL", "KC_NO"] },
+      { name: "QWERTY", rows: [
+        ["KC_TAB", "KC_Q", "KC_W", "KC_E", "KC_R", "KC_T", "KC_Y", "KC_U", "KC_I", "KC_O", "KC_P", "KC_BSPC"],
+        ["KC_LCTL", "KC_A", "KC_S", "KC_D", "KC_F", "KC_G", "KC_H", "KC_J", "KC_K", "KC_L", "KC_SCLN", "KC_QUOT"],
+        ["KC_LSFT", "KC_Z", "KC_X", "KC_C", "KC_V", "KC_B", "KC_N", "KC_M", "KC_COMM", "KC_DOT", "KC_SLSH", "LT(6,KC_ESC)"]
+      ], thumbs: ["KC_LALT", "KC_SPC", "MO(9)", "KC_ENT", "MO(4)", "TO(0)"] },
+      { name: "QWERTY · Numbers", rows: [
+        ["KC_TAB", "KC_Q", "KC_W", "KC_E", "KC_R", "KC_ESC", "KC_Y", "KC_U", "KC_I", "KC_O", "KC_P", "KC_BSPC"],
+        ["KC_LCTL", "KC_1", "KC_2", "KC_3", "KC_4", "KC_5", "KC_H", "KC_LEFT", "KC_DOWN", "KC_UP", "KC_RGHT", "KC_QUOT"],
+        ["KC_LSFT", "KC_6", "KC_7", "KC_8", "KC_9", "KC_0", "KC_N", "KC_M", "KC_COMM", "KC_DOT", "KC_SLSH", "LT(6,KC_ESC)"]
+      ], thumbs: ["KC_LALT", "KC_SPC", "KC_NO", "KC_ENT", "KC_NO", "TO(0)"] }
+    ];
+
+    const labels = {
+      KC_NO: "", KC_SCLN: ";", KC_DOT: ".", KC_SLSH: "/", KC_QUOTE: "'", KC_QUOT: "'", KC_COMM: ",",
+      KC_BSPC: "Backspace", KC_SPC: "Space", KC_TAB: "Tab", KC_ENT: "Enter", KC_ESC: "Esc",
+      KC_DEL: "Delete", KC_CAPS: "Caps", KC_LEFT: "←", KC_DOWN: "↓", KC_UP: "↑", KC_RGHT: "→",
+      KC_INS: "Insert", KC_HOME: "Home", KC_PGDN: "Page ↓", KC_PGUP: "Page ↑", KC_END: "End",
+      KC_LGUI: "⌘", KC_LALT: "⌥", KC_LCTL: "Ctrl", KC_LSFT: "Shift", KC_ALGR: "AltGr",
+      KC_MS_L: "M ←", KC_MS_D: "M ↓", KC_MS_U: "M ↑", KC_MS_R: "M →",
+      KC_WH_L: "W ←", KC_WH_D: "W ↓", KC_WH_U: "W ↑", KC_WH_R: "W →",
+      KC_BTN1: "Mouse 1", KC_BTN2: "Mouse 2", KC_BTN3: "Mouse 3", KC_MPRV: "Prev track",
+      KC_MNXT: "Next track", KC_VOLD: "Volume −", KC_VOLU: "Volume +", KC_MSTP: "Stop",
+      KC_MPLY: "Play / pause", KC_MUTE: "Mute", KC_PSCR: "Print screen", KC_PAUS: "Pause",
+      KC_APP: "Menu", KC_LBRC: "[", KC_RBRC: "]", KC_LCBR: "{", KC_RCBR: "}",
+      KC_GRV: "`", KC_BSLS: "\\", KC_EQL: "=", KC_MINS: "−", KC_UNDS: "_", KC_PLUS: "+",
+      KC_COLN: ":", KC_DLR: "$", KC_PERC: "%", KC_CIRC: "^", KC_TILD: "~", KC_EXLM: "!",
+      KC_AT: "@", KC_HASH: "#", KC_PIPE: "|", KC_AMPR: "&", KC_ASTR: "*", KC_LPRN: "(", KC_RPRN: ")",
+      U_UND: "Undo", U_CUT: "Cut", U_CPY: "Copy", U_PST: "Paste", U_RDO: "Redo",
+      RGB_TOG: "RGB toggle", RGB_MOD: "RGB mode", RGB_HUI: "Hue +", RGB_SAI: "Sat +", RGB_VAI: "Value +"
+    };
+    const modifierNames = { LGUI: "⌘", LALT: "⌥", LCTL: "Ctrl", LSFT: "Shift" };
+    const nav = document.querySelector("#layer-nav");
+    const board = document.querySelector("#board");
+
+    function keyText(token) {
+      const tapHold = token.match(/^(LGUI|LALT|LCTL|LSFT)_T\((KC_[^)]+)\)$/);
+      if (tapHold) return { label: keyText(tapHold[2]).label, detail: modifierNames[tapHold[1]] };
+      const layerTap = token.match(/^LT\((\d+),(KC_[^)]+)\)$/);
+      if (layerTap) return { label: keyText(layerTap[2]).label, detail: `Layer ${layerTap[1]}`, trigger: true };
+      const layerAction = token.match(/^(MO|TG|TO)\((\d+)\)$/);
+      if (layerAction) {
+        const action = { MO: "Hold", TG: "Toggle", TO: "Go to" }[layerAction[1]];
+        return { label: `Layer ${layerAction[2]}`, detail: action, trigger: true };
+      }
+      if (token === "OSM(MOD_LSFT)") return { label: "Shift", detail: "One-shot" };
+      return { label: labels[token] ?? token.replace(/^KC_/, ""), detail: "" };
+    }
+
+    function makeKey(token) {
+      const info = keyText(token);
+      const element = document.createElement("div");
+      element.className = `key${info.label ? "" : " empty"}${info.trigger ? " layer-trigger" : ""}`;
+      element.title = token;
+      element.setAttribute("aria-label", info.label ? `${info.label}${info.detail ? `, hold ${info.detail}` : ""}` : "No key");
+      if (info.label) {
+        const label = document.createElement("span");
+        label.className = "key-label";
+        label.textContent = info.label;
+        element.append(label);
+        if (info.detail) {
+          const detail = document.createElement("span");
+          detail.className = "key-detail";
+          detail.textContent = info.detail;
+          element.append(detail);
+        }
+      }
+      return element;
+    }
+
+    function renderLayer(index) {
+      const layer = layers[index];
+      document.querySelector("#layer-index").textContent = `0${index}`;
+      document.querySelector("#layer-title").textContent = layer.name;
+      board.replaceChildren();
+      ["left", "right"].forEach((hand, handIndex) => {
+        const half = document.createElement("div");
+        half.className = `half ${hand}`;
+        const grid = document.createElement("div");
+        grid.className = "key-grid";
+        layer.rows.forEach(row => row.slice(handIndex * 6, handIndex * 6 + 6).forEach(token => grid.append(makeKey(token))));
+        const thumbs = document.createElement("div");
+        thumbs.className = "thumbs";
+        layer.thumbs.slice(handIndex * 3, handIndex * 3 + 3).forEach(token => thumbs.append(makeKey(token)));
+        half.append(grid, thumbs);
+        board.append(half);
+      });
+      nav.querySelectorAll("button").forEach((button, buttonIndex) => button.setAttribute("aria-pressed", String(buttonIndex === index)));
+    }
+
+    layers.forEach((layer, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = `${index} ${layer.name}`;
+      button.addEventListener("click", () => renderLayer(index));
+      nav.append(button);
+    });
+    renderLayer(0);
+  </script>
+</body>
+</html>
