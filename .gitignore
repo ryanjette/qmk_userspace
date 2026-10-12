@@ -9,7 +9,6 @@
 *.hex
 !crkbd_rev1_Jetset.hex
 *.bin
-*.uf2
 
 # clangd
 compile_commands.json
