@@ -1,3 +1,4 @@
 COMBO_ENABLE = yes
 MOUSEKEY_ENABLE = yes
 RGB_MATRIX_ENABLE = yes
+SRC += oneshot.c

@@ -14,10 +14,11 @@ Using separate config files avoids constantly rewriting global QMK settings.
 
 ## One-time setup (already done)
 
-Two config profiles:
+Three config profiles:
 
 - `~/.qmk-bkb.ini`
 - `~/.qmk-upstream.ini`
+- `~/.qmk-bkb-splinky.ini` for the legacy Bastardkb firmware worktree used by the Splinky v3 Charybdis
 
 Shell shortcuts in `~/.zshrc`:
 
@@ -25,6 +26,20 @@ Shell shortcuts in `~/.zshrc`:
 - `qmk-up` -> run QMK against upstream
 - `qmk-bkb-env` -> show active Bastardkb environment details
 - `qmk-up-env` -> show active upstream environment details
+
+The Splinky profile uses the separate `~/bastardkb-qmk-splinky` worktree on
+`2024-04-08-bkb-master`. The current Bastardkb `main` branch no longer exposes
+the legacy `v2/splinky_3` target. Set up the worktree and profile with:
+
+```sh
+cd "$HOME/bastardkb-qmk"
+git fetch origin
+git worktree add --detach "$HOME/bastardkb-qmk-splinky" origin/2024-04-08-bkb-master
+git -C "$HOME/bastardkb-qmk-splinky" submodule update --init --recursive
+
+qmk --config-file "$HOME/.qmk-bkb-splinky.ini" config user.qmk_home="$HOME/bastardkb-qmk-splinky"
+qmk --config-file "$HOME/.qmk-bkb-splinky.ini" config user.overlay_dir=/Users/ryan.jette/Documents/GitHub/qmk_userspace
+```
 
 ## Daily usage
 
@@ -44,13 +59,37 @@ Quick environment checks:
 ./scripts/qmk-up.sh env | grep -i QMK_HOME
 ```
 
-These wrappers enforce the right config file each time and reduce accidental wrong-repo builds.
+These wrappers enforce the right config file each time and reduce accidental wrong-repo builds. `qmk-bkb.sh` uses `~/.qmk-bkb.ini` for the current Bastardkb `main` checkout; use the dedicated profile below for Splinky v3.
 
 ### Build Bastardkb firmware
 
 ```sh
 qmk-bkb compile -kb bastardkb/charybdis/3x5 -km mineWorking
 ```
+
+### Build Charybdis Splinky v3 firmware
+
+The legacy `2024-04-08-bkb-master` worktree sets the generic Charybdis 3x5
+folder's default target to `v2/splinky_3`. Use the dedicated profile and the
+explicit target so the controller is not confused with Splinktegrated:
+
+```sh
+export PATH="/opt/homebrew/opt/arm-none-eabi-gcc@8/bin:$PATH"
+/opt/homebrew/bin/qmk --config-file "$HOME/.qmk-bkb-splinky.ini" compile \
+	-kb bastardkb/charybdis/3x5/v2/splinky_3 -km Jetset28
+```
+
+Replace `Jetset28` with another userspace keymap, such as `mineWorking`, when
+needed. The verified command above builds `Jetset28` for Splinky v3.
+
+#### Preserve the local Splinky v3 pinout
+
+Do not replace or normalize the pin definitions in
+`keyboards/bastardkb/charybdis/3x5/v2/splinky_3/config.h` or its related local
+hardware configuration from an upstream/default copy. The pinout was changed
+to address issues encountered while building this physical board and must stay
+matched to the assembled hardware. Preserve those local pin assignments during
+firmware updates; change them only when Ryan explicitly requests it.
 
 ### Build non-Bastardkb firmware (upstream)
 
@@ -95,9 +134,14 @@ Run these when you update repositories after a long break.
 ```sh
 cd /Users/ryan.jette/bastardkb-qmk
 git fetch origin
-git checkout origin/bkb-master
+git switch main
+git pull --ff-only
 git submodule update --init --recursive
 ```
+
+Keep the Splinky v3 legacy worktree on `origin/2024-04-08-bkb-master`; do not
+switch the main worktree to that legacy revision. Update its submodules from
+inside `~/bastardkb-qmk-splinky` when needed.
 
 2. Update upstream repo:
 
@@ -123,21 +167,42 @@ Expected values:
 4. Run one test compile for each profile:
 
 ```sh
-qmk-bkb compile -kb bastardkb/charybdis/3x5 -km mineWorking
+qmk-bkb compile -kb <known_good_bkb_keyboard> -km <known_good_bkb_keymap>
 qmk-up compile -kb <known_good_keyboard> -km <known_good_keymap>
 ```
 
 ## Troubleshooting
 
-### Error: invalid keyboard value for Bastardkb path
+### Error: invalid keyboard value for Splinky v3
 
-If `bastardkb/charybdis/3x5/v2/splinky_3` fails in Bastardkb fork, use:
+The current Bastardkb `main` branch does not expose the legacy
+`v2/splinky_3` target. Use the dedicated legacy worktree and
+`~/.qmk-bkb-splinky.ini` profile, not the main `qmk-bkb` profile. The supported
+command is:
 
 ```sh
-qmk-bkb compile -kb bastardkb/charybdis/3x5 -km mineWorking
+/opt/homebrew/bin/qmk --config-file "$HOME/.qmk-bkb-splinky.ini" compile \
+	-kb bastardkb/charybdis/3x5/v2/splinky_3 -km Jetset28
 ```
 
-The Bastardkb fork currently exposes that board as `bastardkb/charybdis/3x5`.
+Do not substitute a `splinktegrated_rev1` or `splinktegrated_rev3` target for a
+Splinky controller.
+
+### Error: `arm-none-eabi-gcc` missing or `stdint.h` not found
+
+Install the compiler if it is missing:
+
+```sh
+brew install arm-none-eabi-gcc
+```
+
+On this machine, the Homebrew GCC 16 package lacks the ARM standard C headers.
+The installed GCC 8 toolchain includes them; put it first on `PATH` before
+building:
+
+```sh
+export PATH="/opt/homebrew/opt/arm-none-eabi-gcc@8/bin:$PATH"
+```
 
 ### Error: missing RP2040 startup file / ChibiOS files
 
