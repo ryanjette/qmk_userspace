@@ -4,11 +4,11 @@
 // 1. this comma separated list defines how many combos will exist in the firmware
 // keep this list 1:1 with the consts below
 // the enums here will be written in CAPS to differentiate them from the consts in 2
-#define U_UND (LGUI(KC_Z))
-#define U_CUT (LGUI(KC_X))
-#define U_CPY (LGUI(KC_C))
-#define U_PST (LGUI(KC_V))
-#define U_RDO (LGUI(KC_Y))
+#define U_UND (LCTL(KC_Z))
+#define U_CUT (LCTL(KC_X))
+#define U_CPY (LCTL(KC_C))
+#define U_PST (LCTL(KC_V))
+#define U_RDO (LCTL(KC_Y))
 #define U_LOCK (LCTL(LGUI(KC_Q)))
 
 enum layers {
@@ -153,7 +153,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_J,           KC_F,           KC_M,             KC_P,           KC_NO,              KC_NO,           KC_DOT,          KC_SLSH,        KC_QUOTE,       KC_Q,           
   KC_R,           KC_S,           KC_N,             KC_D,           KC_NO,              KC_NO,           KC_A,            KC_E,           KC_I,           KC_H,           
   KC_X,           KC_G,           KC_L,             KC_C,           KC_NO,              KC_NO,           KC_U,           KC_O,           KC_Y,           LT(6, KC_K),   
-                                               KC_NO,            LT(1, KC_T),           MO(NAV),         MO(NUM),         MT(MOD_LSFT, KC_SPC)
+                            KC_NO,            LT(1, KC_T),           MO(NAV),         MO(NUM),         MT(MOD_LSFT, KC_SPC)
   ),
 
 //NAV//
@@ -165,10 +165,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [NAV] = LAYOUT(
-    KC_NO, U_CUT,  U_UND,  U_CPY,  U_PST,       U_CUT,  U_PST,  U_CPY,  U_UND,  U_RDO,
-    KC_NO, OS_CMD, OS_ALT, OS_CTRL, OS_SHFT,    KC_CAPS, KC_LEFT, KC_DOWN, KC_UP, KC_RGHT,
-    KC_NO, KC_NO,  KC_TAB, KC_BSPC, KC_NO,      KC_INS,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,
-                    KC_NO,  KC_NO,  KC_NO,      KC_BSPC, KC_DEL
+     U_CUT,  U_UND,  U_CPY,  U_PST, KC_NO,             KC_NO,  KC_NO,  KC_NO, KC_NO,  KC_NO,
+     OS_CMD, OS_ALT, OS_CTRL, OS_SHFT,KC_NO,          KC_CAPS, KC_LEFT, KC_DOWN, KC_UP, KC_RGHT,
+     KC_NO,  KC_TAB, KC_BSPC, KC_NO, KC_NO,           KC_INS,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,
+                    KC_NO,  KC_NO,  KC_NO,            KC_BSPC, KC_DEL
   ),
 
 //RIGHT HAND

@@ -9,6 +9,7 @@
 #define U_CPY (LCTL(KC_C))
 #define U_PST (LCTL(KC_V))
 #define U_RDO (LCTL(KC_Y))
+#define U_LOCK (LCTL(LGUI(KC_Q)))
 
 enum layers {
   NAV = 1,
