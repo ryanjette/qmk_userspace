@@ -158,10 +158,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 //NAV//
   [1] = LAYOUT(
-  U_LOCK,   U_UND,   U_CPY,                         U_PST,                        U_CUT,                              U_CUT,   U_PST,   U_CPY,   U_UND,   U_RDO,
-  KC_NO,    KC_NO,  KC_BTN2,                       KC_BTN1,                      KC_NO,                              KC_CAPS, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT,
-  KC_NO,   POINTER_DEFAULT_DPI_REVERSE,   POINTER_DEFAULT_DPI_FORWARD,  DRAGSCROLL_MODE,KC_NO,                       KC_INS,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,
-                     KC_NO,                         KC_NO,                        KC_ENT,                            KC_BSPC, KC_DEL  
+  KC_NO,   U_UND,   U_CPY,                         U_PST,                                   KC_NO,                              U_CUT,   U_PST,   U_CPY,   U_UND,   U_RDO,
+  KC_NO,    KC_NO,  KC_BTN2,                       KC_BTN1,                                 KC_NO,                              KC_CAPS, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT,
+  U_LOCK,   POINTER_DEFAULT_DPI_REVERSE,   POINTER_DEFAULT_DPI_FORWARD,  DRAGSCROLL_MODE,   KC_NO,                              KC_INS,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,
+                     KC_NO,                         KC_NO,                        KC_ENT,                                       KC_BSPC, KC_DEL  
   ),
 
   [NAV] = LAYOUT(
