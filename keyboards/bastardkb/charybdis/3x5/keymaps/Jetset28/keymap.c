@@ -97,7 +97,7 @@ static oneshot_state os_alt_state = os_up_unqueued;
 static oneshot_state os_cmd_state = os_up_unqueued;
 
 bool is_oneshot_cancel_key(uint16_t keycode) {
-  return keycode == MO(NAV) || keycode == MO(NUM) || keycode == LT(1, KC_T) || keycode == LT(6, KC_K);
+  return keycode == MO(NAV) || keycode == MO(NUM);
 }
 
 bool is_oneshot_ignored_key(uint16_t keycode) {
