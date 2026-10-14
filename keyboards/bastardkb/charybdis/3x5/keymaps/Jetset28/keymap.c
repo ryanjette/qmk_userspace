@@ -104,8 +104,6 @@ bool is_oneshot_ignored_key(uint16_t keycode) {
   switch (keycode) {
     case MO(NAV):
     case MO(NUM):
-    case LT(1, KC_T):
-    case LT(6, KC_K):
     case KC_LSFT:
     case KC_LCTL:
     case KC_LALT:
@@ -160,7 +158,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [1] = LAYOUT(
   KC_NO,   U_UND,   U_CPY,                         U_PST,                                   KC_NO,                              U_CUT,   U_PST,   U_CPY,   U_UND,   U_RDO,
   KC_NO,    KC_NO,  KC_BTN2,                       KC_BTN1,                                 KC_NO,                              KC_CAPS, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT,
-  U_LOCK,   POINTER_DEFAULT_DPI_REVERSE,   POINTER_DEFAULT_DPI_FORWARD,  DRAGSCROLL_MODE,   KC_NO,                              KC_INS,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,
+  U_LOCK,   POINTER_DEFAULT_DPI_REVERSE,   POINTER_DEFAULT_DPI_FORWARD,  DRAGSCROLL_MODE,   SNIPING_MODE_TOGGLE,                 KC_INS,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,
                      KC_NO,                         KC_NO,                        KC_ENT,                                       KC_BSPC, KC_DEL  
   ),
 
