@@ -154,7 +154,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                             KC_NO,            LT(1, KC_T),           MO(NAV),         MO(NUM),         MT(MOD_LSFT, KC_SPC)
   ),
 
-//NAV//
+//MOUSE//
   [1] = LAYOUT(
   KC_NO,   U_UND,   U_CPY,                         U_PST,                                   KC_NO,                              U_CUT,   U_PST,   U_CPY,   U_UND,   U_RDO,
   KC_NO,    KC_NO,  KC_BTN2,                       KC_BTN1,                                 KC_NO,                              KC_CAPS, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT,
